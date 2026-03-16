@@ -11,11 +11,21 @@
       $request = json_decode($postdata);
 
       // Validate required fields
-      if (trim($request->data->title) == '' || trim($request->data->author) == '' ||
+      if (!isset($request->data->bookID) || trim($request->data->bookID) == '' ||
+          trim($request->data->title) == '' || trim($request->data->author) == '' ||
           trim($request->data->publishedDate) == '' || trim($request->data->description) == '') {
             http_response_code(400);
-            echo json_encode(['message' => 'missing required fields.']);
+            echo json_encode(['message' => 'Missing required fields.']);
             exit;
+      }
+
+      // validate numeric id
+      $bookID = (int)$request->data->bookID;
+
+      if ($bookID <= 0) {
+        http_response_code(400);
+        echo json_encode(['message' => 'Invalid bookID.']);
+        exit;
       }
 
       // Sanitize
@@ -24,15 +34,15 @@
       $publishedDate = mysqli_real_escape_string($con, trim($request->data->publishedDate));
       $description = mysqli_real_escape_string($con, trim($request->data->description));
 
-      // Insert into database
-      $sql = "INSERT INTO `books`(`bookID`, `title`, `author`, `publishedDate`, `description`)
-        VALUES (null, '{$title}', '{$author}', '{$publishedDate}', '{$description}')";
+      // Update database
+      $sql = "UPDATE `books` SET `title` = '{$title}', `author` = '{$author}', `publishedDate` = '{$publishedDate}', 
+      `description` = '{$description}' WHERE `bookID` = {$bookID} LIMIT 1";
 
       if (mysqli_query($con, $sql)) {
-        http_response_code(201);
+        http_response_code(200);
         echo json_encode([
           'data' => [
-              'bookID' => mysqli_insert_id($con),
+              'bookID' => $bookID,
               'title' => $title,
               'author' => $author,
               'publishedDate' => $publishedDate,
@@ -42,10 +52,11 @@
       }
       else {
         http_response_code(422);
-        echo json_encode(['message' => 'Database insert failed.']);
+        echo json_encode(['message' => 'Database update failed.']);
       }
 
+    } else {
+      http_response_code(400);
+      echo json_encode(['message' => 'No data received.']);
     }
-
-
 ?>
