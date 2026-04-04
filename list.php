@@ -3,7 +3,7 @@
 
   $books = [];
 
-  $sql = "SELECT bookID, title, author, publishedDate, description FROM books";
+  $sql = "SELECT bookID, title, author, publishedDate, description, imageName FROM books";
 
   if ($result = mysqli_query($con, $sql)) {
 
@@ -16,6 +16,7 @@
       $books[$count]['author'] = $row['author'];
       $books[$count]['publishedDate'] = $row['publishedDate'];
       $books[$count]['description'] = $row['description'];
+      $books[$count]['imageName'] = $row['imageName'];
 
       $count++;
     }

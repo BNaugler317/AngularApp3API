@@ -29,20 +29,20 @@
       $origimg = str_replace('\\', '/', $imageName);
       $new = basename($origimg);
       if (empty($new)) {
-        $new = 'placeholder_100.jpg';
+        $new = 'placeholder.jpg';
       }
 
       // Allowed image file extensions
       $allowedExt = ['jpg', 'jpeg', 'png', 'gif'];
       $ext = strtolower(pathinfo($new, PATHINFO_EXTENSION));
-      if ($new != 'placeholder_100.jpg' && !inarray($ext, $allowedExt)) {
+      if ($new != 'placeholder.jpg' && !in_array($ext, $allowedExt)) {
         http_response_code(400);
         echo json_encode(['message' => 'Invalid image format. Only JPG, PNG, and GIF are allowed.']);
         exit;
       }
 
       // Check duplicate image name
-      if ($new != 'placeholder_100.jpg') {
+      if ($new != 'placeholder.jpg') {
         $checkImageSql = "SELECT 1 FROM books WHERE imageName = '{$new}'";
         $checkImageResult = mysqli_query($con, $checkImageSql);
         if(mysqli_num_rows($checkImageResult) > 0) {
